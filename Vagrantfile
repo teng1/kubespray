@@ -37,6 +37,8 @@ $shared_folders = {}
 $forwarded_ports = {}
 $subnet = "172.17.8"
 $os = "ubuntu1804"
+# Provision kube cluster
+$kube_provision_cluster = false
 $network_plugin = "flannel"
 # Setting multi_networking to true will install Multus: https://github.com/intel/multus-cni
 $multi_networking = false
@@ -50,7 +52,6 @@ $kube_node_instances = $num_instances
 $kube_node_instances_with_disks = false
 $kube_node_instances_with_disks_size = "20G"
 $kube_node_instances_with_disks_number = 2
-
 $playbook = "cluster.yml"
 
 host_vars = {}
@@ -173,7 +174,7 @@ Vagrant.configure("2") do |config|
       }
 
       # Only execute the Ansible provisioner once, when all the machines are up and ready.
-      if i == $num_instances
+      if i == $num_instances && $kube_provision_cluster == true
         node.vm.provision "ansible" do |ansible|
           ansible.playbook = $playbook
           if File.exist?(File.join( $inventory, "hosts.ini"))
